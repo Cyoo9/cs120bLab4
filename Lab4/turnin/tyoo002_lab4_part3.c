@@ -20,7 +20,7 @@ void Tick() {
 			state = Off_Release;
 			break;
 		case Off_Release:
-			if(PINA == 0x02) {
+			if(PINA == 0x04) {
 				state = On_Press;
 			}
 			else if(PINA == 0x80) PORTB = 0x00;
@@ -31,7 +31,7 @@ void Tick() {
 			else { state = On_Press; }
 			break;
 		case On_Release:
-			if(PINA == 0x01) {
+			if(PINA == 0x02) {
 				PORTB = 0x01;
 			}
 			else if(PINA == 0x80) PORTB = 0x00;
