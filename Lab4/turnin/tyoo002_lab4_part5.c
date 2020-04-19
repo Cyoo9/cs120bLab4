@@ -26,14 +26,14 @@ void Tick() {
 		case Off_Release:
 			if(PINA == code[i]) {	
 				if(i == 3) { //last code required 'X'
-					i = 0;
+					//i = 0;
 					if(PORTB == 0x00) { PORTB = 0x01; }
 					else { PORTB = 0x00; }
 				}
 				else { i++; }
 				state = On_Press;
 			}
-			else if(PINA == 0x80) PORTB = 0x00;
+			else if(PINA == 0x80) { PORTB = 0x00; }
 			else state = Off_Release;
 			break;
 		case On_Press:
