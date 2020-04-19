@@ -1,0 +1,42 @@
+$timescale 10ns $end
+$scope module logic $end
+$var wire 1 ! PINA0 $end
+$var wire 8 " PORTB $end
+$upscope $end
+$enddefinitions $end
+$dumpvars
+x!
+bxxxxxxxx "
+$end
+#2400
+b00000000 "
+#2462
+b00000000 "
+#2463
+b00000000 "
+#2850
+b00000001 "
+#2851
+b00000001 "
+#3362
+1!
+#3650
+b00000010 "
+#3651
+b00000010 "
+#4137
+b00000001 "
+#4138
+b00000001 "
+#4937
+b00000010 "
+#4938
+b00000010 "
+#5450
+0!
+#6862
+1!
+#7150
+b00000001 "
+#7151
+b00000001 "
