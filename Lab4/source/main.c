@@ -16,6 +16,7 @@ enum States {Start, Off_Release, On_Press} state;
 
 unsigned char code[4] = {0x04,0x01,0x02,0x01}; // code to unlock/lock
 unsigned char i = 0; //array index
+unsigned char temp = 0x00;
 
 void Tick() {
 	//initial state is locked 
@@ -27,13 +28,19 @@ void Tick() {
 			if(PINA == code[i]) {	
 				if(i == 3) { //last code required 'X'
 					i = 0;
-					if(PORTB == 0x00) { PORTB = 0x01; }
-					else { PORTB = 0x00; }
+					if(temp == 0x00) { 
+						temp = 0x01;
+						PORTB = temp; 
+					}
+					else { 
+						temp = 0x00;
+						PORTB = temp;
+					}
 				}
 				else { i++; }
 				state = On_Press;
 			}
-			else if(PINA == 0x80) PORTB = 0x00;
+			else if(PINA == 0x80) { PORTB = 0x00; }
 			else state = Off_Release;
 			break;
 		case On_Press:
