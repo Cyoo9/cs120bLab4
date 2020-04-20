@@ -1,6 +1,6 @@
 /*	Author: tyoo002
  *  Partner(s) Name: Microcontroller [atmega1284]:
- *	Lab Section:
+ *	Lab Section: 23
  *	Assignment: Lab #  Exercise #
  *	Exercise Description: [optional - include for your own benefit]
  *
@@ -12,46 +12,74 @@
 #include "simAVRHeader.h"
 #endif
 
-enum States {Start, Off_Release, On_Press, On_Release, Off_Press} state;
+unsigned char countOne = 0;
+unsigned char countTwo = 0;
+enum States {Start, Off, WaitUntilThree, Increment, Decrement, Reset} state;
 
-void Tick() {
-        switch(state) {
-                case Start:
-                        PORTC = 0x07;
-                        state = Off_Release;
-                        break;
-                case Off_Release:
-			if(PINA != 0x00) {
-				state = On_Press;
-			}
-			else { 
-				state = Off_Release;
-			}
+void Tick() { 
+	switch(state) {
+		case Start:
+			PORTC = 0x07;
+			state = Off;
 			break;
-		case On_Press:
-			if(!PINA) { 
-				state = On_Release;
-			}
-			else {
-				state = On_Press;
-			}
-			break;
-                default:
-                        break;
-        }	
-	switch(state) {	
-		case On_Press:
-			if(PINA == 0x01) { 
-				if(PORTC < 9) { PORTC++; }
+		case Off:
+			if(PINA == 0x01) {
+				state = Increment;
+				if(PORTC < 0x09) {
+					PORTC++;
+				}
+				break;
 			}
 			else if(PINA == 0x02) {
-				if(PORTC > 0) { PORTC--; }
+				state = Decrement;
+				if(PORTC > 0x00) {
+					PORTC--;
+				}
+				break;
 			}
-			else if(PINA == 0x03) { PORTC = 0; }
+			else if(PINA == 0x03) {
+				PORTC = 0;
+				state = Reset;
+				break;
+			}
+			else { 
+				state = Off;
+				break;
+			}
+		case Increment:
+			state = WaitUntilThree;
 			break;
-	}	
-
+		case Decrement:
+			state = WaitUntilThree;
+			break;
+		case WaitUntilThree:
+			if(PINA == 0x01 || PINA == 0x02) {
+				state = WaitUntilThree;
+				break;
+			}
+			else if(PINA == 0x03) {
+				state = Reset;
+				PORTC = 0;
+			}
+			else { 
+				state = Off; 
+				break; 
+			}
+		case Reset:
+			if(PINA == 0x01 || PINA == 0x02) {
+				state = Reset;
+				break;
+			}
+			else {
+				state = Off;
+				break;
+			}
+		default:
+			break;
+	}
 }
+
+
 int main(void) {
     /* Insert DDR and PORT initializations */
     DDRA = 0x00; PORTA = 0xFF;

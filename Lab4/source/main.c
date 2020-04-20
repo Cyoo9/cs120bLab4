@@ -1,6 +1,6 @@
 /*	Author: tyoo002
  *  Partner(s) Name: Microcontroller [atmega1284]:
- *	Lab Section:
+ *	Lab Section: 23
  *	Assignment: Lab #  Exercise #
  *	Exercise Description: [optional - include for your own benefit]
  *
@@ -12,58 +12,84 @@
 #include "simAVRHeader.h"
 #endif
 
-enum States {Start, Off_Release, On_Press} state;
+unsigned char countOne = 0;
+unsigned char countTwo = 0;
+enum States {Start, Off, WaitUntilThree, Increment, Decrement, Reset} state;
 
-unsigned char code[4] = {0x04,0x01,0x02,0x01}; // code to unlock/lock
-unsigned char i = 0; //array index
-unsigned char temp = 0x00;
-
-void Tick() {
-	//initial state is locked 
+void Tick() { 
 	switch(state) {
 		case Start:
-			state = Off_Release;
+			PORTC = 0x07;
+			state = Off;
 			break;
-		case Off_Release:
-			if(PINA == code[i]) {	
-				if(i == 3) { //last code required 'X'
-					i = 0;
-					if(temp == 0x00) { 
-						temp = 0x01;
-						PORTB = temp; 
-					}
-					else { 
-						temp = 0x00;
-						PORTB = temp;
-					}
+		case Off:
+			if(PINA == 0x01) {
+				state = Increment;
+				if(PORTC < 0x09) {
+					PORTC++;
 				}
-				else { i++; }
-				state = On_Press;
+				break;
 			}
-			else if(PINA == 0x80) { PORTB = 0x00; }
-			else state = Off_Release;
-			break;
-		case On_Press:
-			if(!PINA) { 
-				state = Off_Release;
+			else if(PINA == 0x02) {
+				state = Decrement;
+				if(PORTC > 0x00) {
+					PORTC--;
+				}
+				break;
 			}
-			else { state = On_Press; }
+			else if(PINA == 0x03) {
+				PORTC = 0;
+				state = Reset;
+				break;
+			}
+			else { 
+				state = Off;
+				break;
+			}
+		case Increment:
+			state = WaitUntilThree;
 			break;
+		case Decrement:
+			state = WaitUntilThree;
+			break;
+		case WaitUntilThree:
+			if(PINA == 0x01 || PINA == 0x02) {
+				state = WaitUntilThree;
+				break;
+			}
+			else if(PINA == 0x03) {
+				state = Reset;
+				PORTC = 0;
+			}
+			else { 
+				state = Off; 
+				break; 
+			}
+		case Reset:
+			if(PINA == 0x01 || PINA == 0x02) {
+				state = Reset;
+				break;
+			}
+			else {
+				state = Off;
+				break;
+			}
 		default:
 			break;
 	}
 }
+
+
 int main(void) {
     /* Insert DDR and PORT initializations */
     DDRA = 0x00; PORTA = 0xFF;
-    DDRB = 0xFF; PORTB = 0x00;
     DDRC = 0xFF; PORTC = 0x00;
 
     /* Insert your solution below */
     state = Start;
     while (1) {
-	Tick();
+        Tick();
     }
-    //PORTC = state;
     return 0;
 }
+
