@@ -27,7 +27,7 @@ echo ======================================================\n
 echo Running all tests..."\n\n
 
 # Example test:
-test "PINA: 0x00 => PORTB: 0x02"
+test "PINA: 0x01 => PORTB: 0x02"
 set state = Start
 setPINA 0x01
 # Continue for several ticks
